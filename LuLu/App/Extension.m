@@ -50,12 +50,13 @@ extern os_log_t logHandle;
     }
     
     //sanity check
-    if(nil == request)
-    {
-        //err msg
+    if(!request) {
+    
         os_log_error(logHandle, "ERROR: failed to create request for extension");
+    
+        //call reply
+        self.replyBlock([NSError errorWithDomain:@BUNDLE_ID code:-1 userInfo:@{NSLocalizedDescriptionKey: @"Failed to create system extension request"}]);
         
-        //bail
         goto bail;
     }
     
@@ -99,7 +100,7 @@ bail:
     __block BOOL wasError = NO;
     
     //config
-    __block NEFilterProviderConfiguration* config = nil;
+    NEFilterProviderConfiguration* config = nil;
     
     //wait semaphore
     dispatch_semaphore_t semaphore = 0;
@@ -141,35 +142,41 @@ bail:
     os_log_debug(logHandle, "loaded current filter configuration for the network extension");
 
     //activate?
+    // create new config, configure, save
     if(ACTION_ACTIVATE == action)
     {
         //dbg msg
         os_log_debug(logHandle, "activating network extension...");
         
-        //no config?
-        // alloc/init/set one...
-        // and then set 'enabled' flag
-        if(nil == NEFilterManager.sharedManager.providerConfiguration)
-        {
-            //init config
-            config = [[NEFilterProviderConfiguration alloc] init];
+        //already enabled
+        // good to go already
+        if(NEFilterManager.sharedManager.enabled == YES) {
+            os_log_debug(logHandle, "network extension already enabled; skipping save");
             
-            //don't care about packets
-            config.filterPackets = NO;
-            
-            //filter sockets!
-            config.filterSockets = YES;
-            
-            //set config
-            NEFilterManager.sharedManager.providerConfiguration = config;
+            //done
+            toggled = YES;
+            goto bail;
         }
+        
+        
+        //init config
+        config = [[NEFilterProviderConfiguration alloc] init];
+            
+        //don't care about packets
+        config.filterPackets = NO;
+            
+        //filter sockets
+        config.filterSockets = YES;
+        
+        //set config
+        NEFilterManager.sharedManager.providerConfiguration = config;
         
         //set flag
         NEFilterManager.sharedManager.enabled = YES;
     }
     
     //deactivate
-    // just set 'enabled' flag
+    // just set 'enabled' flag to NO
     else
     {
         //dbg msg

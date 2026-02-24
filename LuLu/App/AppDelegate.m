@@ -295,7 +295,6 @@ bail:
    return (nil == [[NSMutableDictionary dictionaryWithContentsOfFile:[INSTALL_DIRECTORY stringByAppendingPathComponent:PREFS_FILE]] objectForKey:PREF_INSTALL_TIMESTAMP]);
 }
 
-
 //handle user double-clicks
 // app is (likely) already running as login item, so show (or) activate window
 -(BOOL)applicationShouldHandleReopen:(NSApplication *)sender hasVisibleWindows:(BOOL)hasVisibleWindows
