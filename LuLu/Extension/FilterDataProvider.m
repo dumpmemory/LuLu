@@ -936,7 +936,7 @@ bail:
     return;
 }
 
-//process related flows
+//process related flow for a process
 -(void)processRelatedFlow:(NSString*)key
 {
     //flows
@@ -947,6 +947,9 @@ bail:
 
     //verdict
     NEFilterNewFlowVerdict* verdict = nil;
+    
+    //pause verdict
+    NEFilterNewFlowVerdict* pauseVerdict = [NEFilterNewFlowVerdict pauseVerdict];
 
     //dbg msg
     os_log_debug(logHandle, "processing %lu related flow(s) for %{public}@", (unsigned long)[self.relatedFlows[key] count], key);
@@ -954,10 +957,10 @@ bail:
     //sync
     @synchronized(self.relatedFlows)
     {
-        //grab flows for process
+        //grab flows for specified process
         flows = self.relatedFlows[key];
-        for(NSInteger i = flows.count - 1; i >= 0; i--)
-        {
+        for (NSInteger i = flows.count; i-- > 0; ) {
+            
             //grab flow
             flow = flows[i];
 
@@ -965,15 +968,14 @@ bail:
             // returns verdict for this flow
             verdict = [self processEvent:flow];
 
-            //pause means alert is/was shown
-            // ...so stop, and wait for user response (which will retrigger processing)
-            if([NEFilterNewFlowVerdict pauseVerdict] == verdict)
-            {
+            //pause means alert is shown
+            // so we'll stop/wait for user response (which will retrigger processing)
+            if([pauseVerdict isEqual:verdict]) {
                 //stop
                 break;
             }
 
-            //resume already-paused flow with determined verdict
+            //resume (previously) paused flow
             [self resumeFlow:flow withVerdict:verdict];
 
             //remove from related flows
@@ -981,15 +983,10 @@ bail:
         }
 
         //cleanup empty entry
-        if(0 == flows.count)
-        {
+        if(0 == flows.count) {
             [self.relatedFlows removeObjectForKey:key];
         }
     }
-
-bail:
-
-    return;
 }
 
 //create process object
