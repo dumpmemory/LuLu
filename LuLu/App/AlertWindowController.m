@@ -49,7 +49,9 @@ extern NSMutableDictionary* alerts;
     [self.window center];
     
     //full size content view for translucency
-    self.window.styleMask = self.window.styleMask | NSWindowStyleMaskFullSizeContentView;
+    // also clear 'resizable': the alert is a fixed two-state size (collapsed/expanded),
+    // and its labels are fixed-frame, so user resizing would just truncate content
+    self.window.styleMask = (self.window.styleMask | NSWindowStyleMaskFullSizeContentView) & ~NSWindowStyleMaskResizable;
     
     //title bar translucency
     self.window.titlebarAppearsTransparent = YES;

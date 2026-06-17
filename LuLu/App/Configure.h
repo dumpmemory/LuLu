@@ -14,7 +14,9 @@
 @interface Configure : NSObject
 
 //quit
--(void)quit;
+// 'deactivateExtension': YES to also deactivate/unregister the system extension (uninstall);
+//  NO to leave it registered/approved (quit & upgrade) so updates don't require re-approval
+-(void)quit:(BOOL)deactivateExtension;
 
 //install
 -(BOOL)install;

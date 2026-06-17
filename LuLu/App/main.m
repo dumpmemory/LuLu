@@ -144,12 +144,13 @@ int main(int argc, const char * argv[]) {
         {
             //init
             configure = [[Configure alloc] init];
-            
+
             //dbg msg
             os_log_debug(logHandle, "performing cmdline quit");
-            
+
             //quit
-            [configure quit];
+            // this copy exists solely to deactivate the system extension
+            [configure quit:YES];
             
             //done
             goto bail;

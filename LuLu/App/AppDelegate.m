@@ -775,16 +775,22 @@ bail:
         
         //slight delay to let alert dismiss
         dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (0.1 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
-                    
+
+            //turn the firewall off
+            // disable the network filter so LuLu stops filtering (user's expectation on quit)
+            // note: leaves the system extension registered/approved -> re-enabled on next launch, no re-approval
+            [[[Extension alloc] init] toggleNetworkExtension:ACTION_DEACTIVATE];
+
             //config obj
             Configure* configure = [[Configure alloc] init];
-            
+
             //quit
-            [configure quit];
-            
+            // leave the system extension activated (don't deactivate -> no re-approval on update)
+            [configure quit:NO];
+
             //and terminate
             [NSApplication.sharedApplication terminate:self];
-            
+
         });
     }
     

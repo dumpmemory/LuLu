@@ -1476,6 +1476,9 @@
         }
       }
     },
+    "%@ is not a valid CIDR (e.g. 192.168.1.0/24)" : {
+      "comment" : "%@ is not a valid CIDR (e.g. 192.168.1.0/24)"
+    },
     "%@ is not a valid regular expression\r\ndetails: %@" : {
       "comment" : "%@ is not a valid regular expression\r\ndetails: %@",
       "localizations" : {
@@ -4486,6 +4489,12 @@
         }
       }
     },
+    "Delete all rules for %@?" : {
+      "comment" : "Delete all rules for %@?"
+    },
+    "Delete all rules for this item?" : {
+      "comment" : "Delete all rules for this item?"
+    },
     "Delete profile: '%@'?" : {
       "comment" : "Delete profile: '%@'?",
       "localizations" : {
@@ -5716,6 +5725,9 @@
           }
         }
       }
+    },
+    "ERROR: invalid CIDR" : {
+      "comment" : "ERROR: invalid CIDR"
     },
     "ERROR: invalid path" : {
       "comment" : "ERROR: invalid path",

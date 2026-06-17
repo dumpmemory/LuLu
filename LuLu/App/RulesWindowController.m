@@ -875,10 +875,30 @@ static const NSUInteger kDeleteKeyCode = 51;
         [super keyDown:event];
         return;
     }
-        
+
+    //grab item for the selected row
+    id item = [self.outlineView itemAtRow:selectedRow];
+
+    //alert message
+    // default: single rule
+    NSString* message = NSLocalizedString(@"Delete Rule?", @"Delete Rule?");
+
+    //group (all rules for a program)?
+    // ...call out that *all* its rules will be deleted, by name (e.g. 'curl')
+    if([item isKindOfClass:[NSArray class]])
+    {
+        //process name (from the group's first rule)
+        NSString* name = [(Rule*)[item firstObject] name];
+
+        //customize message
+        message = (0 != name.length) ?
+            [NSString stringWithFormat:NSLocalizedString(@"Delete all rules for %@?", @"Delete all rules for %@?"), name] :
+            NSLocalizedString(@"Delete all rules for this item?", @"Delete all rules for this item?");
+    }
+
     //show alert
     NSModalResponse response = showAlert(NSAlertStyleWarning,
-                                           NSLocalizedString(@"Delete Rule?", @"Delete Rule?"),
+                                           message,
                                            nil,
                                            @[NSLocalizedString(@"Delete", @"Delete"),
                                              NSLocalizedString(@"Cancel", @"Cancel")]);

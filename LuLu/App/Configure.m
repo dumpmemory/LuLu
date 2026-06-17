@@ -58,9 +58,10 @@ extern XPCDaemonClient* xpcDaemonClient;
     //dbg msg
     os_log_debug(logHandle, "function '%s' invoked", __PRETTY_FUNCTION__);
     
-    //quit LuLu
-    [self quit];
-    
+    //quit any running LuLu
+    // leave the system extension registered (this is an install/upgrade)
+    [self quit:NO];
+
     //init source
     source = NSBundle.mainBundle.bundlePath;
     
@@ -153,8 +154,8 @@ bail:
     //first, remove login item
     toggleLoginItem([NSURL fileURLWithPath:app], ACTION_UNINSTALL_FLAG);
 
-    //quit (other) LuLus, network monitor, extension
-    [self quit];
+    //quit (other) LuLus, network monitor, and deactivate the system extension
+    [self quit:YES];
     
     //app found in /Apps?
     if(YES == [NSFileManager.defaultManager fileExistsAtPath:app])
@@ -185,8 +186,9 @@ bail:
 }
 
 //quit
-// and optionally uninstall
--(void)quit
+// 'deactivateExtension': YES to also deactivate/unregister the system extension (uninstall);
+//  NO to leave it registered/approved (quit & upgrade) so updates don't require re-approval
+-(void)quit:(BOOL)deactivateExtension
 {
     //extension
     Extension* extension = nil;
@@ -245,8 +247,9 @@ bail:
     //terminate NQ
     [self terminateNetworkMonitor];
 
-    //need to stop extension?
-    if(YES == [extension isExtensionRunning])
+    //need to deactivate the system extension?
+    // only on uninstall — quit/upgrade leave it registered (so updates don't re-prompt)
+    if(YES == deactivateExtension && YES == [extension isExtensionRunning])
     {
         //dbg msg
         os_log_debug(logHandle, "extension running, will deactivate...");
